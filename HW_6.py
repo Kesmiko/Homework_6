@@ -1,4 +1,5 @@
 from collections import UserDict
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -12,11 +13,9 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, phone):
+        if not phone.isdigit() or len(phone) != 10:
+            raise ValueError("Phone number must be 10 digits")
         super().__init__(phone)
-        if len(str(phone)) == 10 and str(phone).isdigit() == True:
-            self.phone=phone
-        else:
-            raise ValueError ("Phone number must be 10 digits") 
 
 class Record:
     def __init__(self, name):
@@ -27,29 +26,38 @@ class Record:
         self.phones.append(Phone(phone))
 
     def remove_phone(self, phone):
-        self.phones = [p for p in self.phones if str(Phone(p)) != str(Phone(phone))]
+        self.phones = [p for p in self.phones if str(p) != phone]
 
-    def edit_phone(self, phone, new_phone):
-        self.phones = [p for p in self.phones if str(Phone(p)) != str(Phone(phone))]
-        self.phones.append(Phone(new_phone))
+    def edit_phone(self, old_phone, new_phone):
+        self.remove_phone(old_phone)
+        self.add_phone(new_phone)
+        if not old_phone and new_phone:
+            raise ValueError("This number not found")
 
-    def find_phone(self,phone):
-        self.phones = [p for p in self.phones if str(Phone(p)) == str(Phone(phone))]
-        phone = self.phones[0]
-        return phone
-    
+    def find_phone(self, phone):
+        for p in self.phones:
+            if str(p) == phone:
+                return p
+        return None
+
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
-     
+        phones_str = '; '.join(str(p) for p in self.phones)
+        return f"Contact name: {self.name}, phones: {phones_str}"
+
 class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
- 
+
     def find(self, name):
-        return self.data.get(name)
-    
+        for record in self.data.values():
+            if record.name.value == name:
+                return record
+        return None
+
     def delete(self, name):
-        return self.data.pop(name)
+        if name in self.data:
+            del self.data[name]
+
         
              
 # Створення нової адресної книги
