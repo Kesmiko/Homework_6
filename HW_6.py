@@ -26,23 +26,25 @@ class Record:
         self.phones.append(Phone(phone))
 
     def remove_phone(self, phone):
-        self.phones = [p for p in self.phones if str(p) != phone]
+        self.phones = [p for p in self.phones if p != phone]
 
     def edit_phone(self, old_phone, new_phone):
-        self.remove_phone(old_phone)
-        self.add_phone(new_phone)
-        if not old_phone and new_phone:
-            raise ValueError("This number not found")
+        for p in self.phones:
+            if p.value == old_phone:
+                p.value = new_phone
+                return
+            else:
+                raise ValueError("This number not found")
 
     def find_phone(self, phone):
         for p in self.phones:
-            if str(p) == phone:
+            if p.value == phone:
                 return p
         return None
 
     def __str__(self):
-        phones_str = '; '.join(str(p) for p in self.phones)
-        return f"Contact name: {self.name}, phones: {phones_str}"
+        phones_str = '; '.join(map(str, self.phones))
+        return f"Contact name: {set([self.name.value])}, phones: {phones_str}"
 
 class AddressBook(UserDict):
     def add_record(self, record):
